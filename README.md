@@ -1,69 +1,182 @@
 # ChatApp
 
-## Docker compose
+A real-time chat application built with a **microservices architecture**, containerized with Docker, and deployable to Kubernetes. The system is composed of independent services for authentication, user management, and messaging, all orchestrated behind an Nginx reverse proxy.
 
-To deploy this app in docker-compose, follow these steps: 
+---
 
-In the auth_service, users_services & chat_service, create a .env file 
-with the next env variables: 
+## Architecture Overview
 
-`PORT = 4001`
-`PORT = 4002`
-`PORT = 4003`
+```
+                        ┌─────────────────────────────────────────────────────┐
+                        │                      Nginx                          │
+                        │               (Reverse Proxy — Port 80)             │
+                        └───────────────┬─────────────────┬───────────────────┘
+                                        │                 │
+                              ┌─────────▼──────┐  ┌──────▼──────┐
+                              │   Client (React)│  │  Middleware  │
+                              │    Port 3000    │  │  Port 4000   │
+                              └─────────────────┘  └──────┬──────┘
+                                                          │
+                         ┌────────────────────────────────┼──────────────────────┐
+                         │                                │                      │
+               ┌─────────▼──────┐              ┌─────────▼──────┐  ┌────────────▼───┐
+               │  Auth Service  │              │  Users Service │  │  Chat Service  │
+               │   Port 4001    │              │   Port 4002    │  │   Port 4003    │
+               └─────────┬──────┘              └────────┬───────┘  └────────┬───────┘
+                         │                              │                    │
+                         └──────────────────────────────┼────────────────────┘
+                                                        │
+                                              ┌─────────▼──────┐
+                                              │    MongoDB      │
+                                              │   Port 27017   │
+                                              └────────────────┘
+```
 
-respectively, and
+### Services
 
-`MONGO_HOST = mongo`
+| Service | Description | Port |
+|---|---|---|
+| `client` | React frontend | 3000 |
+| `middleware` | API gateway, routes requests to internal services | 4000 |
+| `auth_service` | Handles registration, login and JWT issuance | 4001 |
+| `users_service` | Manages user data and profiles | 4002 |
+| `chat_service` | Handles real-time messaging | 4003 |
+| `nginx` | Reverse proxy for the client and middleware | 80 |
+| `mongo` | Primary database (MongoDB) | 27017 |
 
-for each one. Also, for the auth_service, add the next environmental variable
+---
 
-`JWT_SECRET`
+## Tech Stack
 
-with your own choice for a secret key.
+- **Frontend:** React
+- **Backend:** Node.js (microservices)
+- **Database:** MongoDB
+- **Gateway:** Custom middleware service
+- **Reverse Proxy:** Nginx
+- **Containerization:** Docker / Docker Compose
+- **Orchestration:** Kubernetes (Minikube)
 
-For the middleware gateway, please create also an .env file with the next 
+---
 
-`PORT = 4000`
-`AUTH_BASE_URL = 'http://auth:4001/'`
-`USERS_BASE_URL = 'http://users:4002/'`
-`CHAT_BASE_URL = 'http://chat:4003/'`
+## Getting Started
 
-Next, go to the root folder, where you can find the docker-compose.yml file 
-and run 
+### Prerequisites
 
-`docker-compose up --build`
+- [Docker](https://www.docker.com/) and Docker Compose, **or**
+- [Minikube](https://minikube.sigs.k8s.io/) and [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
-Then, if you go to the browser, to localhost, you must be able to 
-watch the app running. 
+---
 
-## Minikube
+## Deployment
 
-To deploy this app in Minikube you must run the next commands. 
+### Option 1 — Docker Compose
 
-Go to the k8s folder. 
-`cd k8s`
+#### 1. Configure environment variables
 
-Within this folder, you must run the next 
-`kubectl apply -f database-persistent-volume-claim.yml`
-`kubectl apply -f persistent-volume.yml`
-`kubectl apply -f mongo-deployment.yml`
-`kubectl apply -f mongo-service.yml`
-`kubectl apply -f nginx-configMap.yml`
-`kubectl apply -f client-deployment.yml`
-`kubectl apply -f client-service.yml`
-`kubectl apply -f middleware-deployment.yml`
-`kubectl apply -f middleware-service.yml`
-`kubectl apply -f auth-deployment.yml`
-`kubectl apply -f auth-service.yml`
-`kubectl apply -f chat-deployment.yml`
-`kubectl apply -f chat-service.yml`
-`kubectl apply -f users-deployment.yml`
-`kubectl apply -f users-service.yml`
+For each of the following services (`auth_service`, `users_service`, `chat_service`), create a `.env` file inside the corresponding folder.
 
-Then, you can verify that everything is correct using the next command
+**auth_service/.env**
+```env
+PORT=4001
+MONGO_HOST=mongo
+JWT_SECRET=your_secret_key_here
+```
 
-`kubectl get all`
+**users_service/.env**
+```env
+PORT=4002
+MONGO_HOST=mongo
+```
 
-Once each POD is running, expose the service with
+**chat_service/.env**
+```env
+PORT=4003
+MONGO_HOST=mongo
+```
 
-`minikube service nginx`
+**middleware/.env**
+```env
+PORT=4000
+AUTH_BASE_URL='http://auth:4001/'
+USERS_BASE_URL='http://users:4002/'
+CHAT_BASE_URL='http://chat:4003/'
+```
+
+#### 2. Build and run
+
+From the root directory (where `docker-compose.yml` lives):
+
+```bash
+docker-compose up --build
+```
+
+#### 3. Open the app
+
+Navigate to [http://localhost](http://localhost) in your browser.
+
+---
+
+### Option 2 — Minikube (Kubernetes)
+
+#### 1. Navigate to the k8s folder
+
+```bash
+cd k8s
+```
+
+#### 2. Apply all manifests
+
+```bash
+kubectl apply -f database-persistent-volume-claim.yml
+kubectl apply -f persistent-volume.yml
+kubectl apply -f mongo-deployment.yml
+kubectl apply -f mongo-service.yml
+kubectl apply -f nginx-configMap.yml
+kubectl apply -f client-deployment.yml
+kubectl apply -f client-service.yml
+kubectl apply -f middleware-deployment.yml
+kubectl apply -f middleware-service.yml
+kubectl apply -f auth-deployment.yml
+kubectl apply -f auth-service.yml
+kubectl apply -f chat-deployment.yml
+kubectl apply -f chat-service.yml
+kubectl apply -f users-deployment.yml
+kubectl apply -f users-service.yml
+```
+
+#### 3. Verify the cluster
+
+```bash
+kubectl get all
+```
+
+Wait until all pods show a `Running` status.
+
+#### 4. Expose the service
+
+```bash
+minikube service nginx
+```
+
+---
+
+## Project Structure
+
+```
+ChatApp/
+├── auth_service/        # Authentication microservice
+├── chat_service/        # Chat / messaging microservice
+├── client/              # React frontend
+├── k8s/                 # Kubernetes manifests
+├── middleware/          # API gateway
+├── nginx/               # Nginx reverse proxy config
+├── users_service/       # User management microservice
+├── docker-compose.yml   # Local multi-container setup
+└── .gitignore
+```
+
+---
+
+## License
+
+This project is open source. Feel free to use it as a reference or starting point for your own projects.
