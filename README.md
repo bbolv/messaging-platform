@@ -1,6 +1,16 @@
-# ChatApp
+# Messaging Platform
 
-A real-time chat application built with a **microservices architecture**, containerized with Docker, and deployable to Kubernetes. The system is composed of independent services for authentication, user management, and messaging, all orchestrated behind an Nginx reverse proxy.
+A distributed messaging platform built using a microservices architecture.
+
+The project demonstrates:
+
+- API Gateway pattern
+- Service decomposition
+- JWT authentication
+- Containerized deployment
+- Kubernetes orchestration
+- Reverse proxy configuration
+- Inter-service communication
 
 ---
 
