@@ -4,29 +4,30 @@ import User from "../models/User.js";
 const checkAuth = async (req, res, next) => {
     let token;
     if (
-        req.headers.authorization && 
-        req.headers.authorization.startsWith('Bearer')
+        req.headers.authorization &&
+        req.headers.authorization.startsWith("Bearer")
     ) {
         try {
-            token = req.headers.authorization.split(' ')[1];
-            
+            token = req.headers.authorization.split(" ")[1];
+
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            
-            req.user = await User.findById(decoded.id).select("-password -token -__v");
-            
+
+            req.user = await User.findById(decoded.id).select(
+                "-password -token -__v"
+            );
+
             return next();
-        }
-        catch (error) {
-            return res.status(404).json({msg: "There is an error"});
+        } catch (error) {
+            return res.status(404).json({ msg: "There is an error" });
         }
     }
-    
-    if(!token) {
-        const error = new Error ('No valid token');
-        return res.status(401).json({msg: error.message});
+
+    if (!token) {
+        const error = new Error("No valid token");
+        return res.status(401).json({ msg: error.message });
     }
 
     next();
-}
+};
 
 export default checkAuth;

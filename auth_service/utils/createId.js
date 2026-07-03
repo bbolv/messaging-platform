@@ -2,6 +2,6 @@ const createId = () => {
     const random = Math.random().toString(32).substring(32);
     const date = Date.now().toString(32);
     return random + date;
-}
+};
 
-export default createId
+export default createId;

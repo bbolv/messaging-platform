@@ -1,24 +1,32 @@
 {
-  "name": "users_service",
-  "version": "1.0.0",
-  "description": "Users service chat app",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
-  },
-  "keywords": [
-    "Users"
-  ],
-  "author": "Brandon Bautista",
-  "license": "ISC",
-  "devDependencies": {
-    "nodemon": "^2.0.22"
-  },
-  "dependencies": {
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "mongoose": "^7.0.5"
-  }
+    "name": "users_service",
+    "version": "1.0.0",
+    "description": "Users service chat app",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "dev": "nodemon index.js",
+        "start": "node index.js",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier . --write",
+        "format:check": "prettier . --check",
+        "check": "npm run lint && npm run format:check"
+    },
+    "keywords": [
+        "Users"
+    ],
+    "author": "Brandon Bautista",
+    "license": "ISC",
+    "devDependencies": {
+        "nodemon": "^2.0.22",
+        "eslint": "^8.50.0",
+        "eslint-config-prettier": "^10.1.8",
+        "prettier": "^3.9.4"
+    },
+    "dependencies": {
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "mongoose": "^7.0.5"
+    }
 }

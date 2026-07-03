@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 import { Schema, model } from "mongoose";
 
 const UserSchema = new Schema({
@@ -34,8 +32,8 @@ const UserSchema = new Schema({
         type: Array,
         default: [Object]
     }
-})
+});
 
-const Users = mongoose.model("User", UserSchema);
+const Users = model("User", UserSchema);
 
 export default Users;

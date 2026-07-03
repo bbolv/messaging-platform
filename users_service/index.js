@@ -1,7 +1,8 @@
 import express from "express";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 import dbConnection from "./db/config.js";
 import userRoutes from "./routes/usersRoutes.js";
+import healthRoute from "./routes/healthRoutes.js";
 
 //configure the use of environment variables
 dotenv.config();
@@ -10,16 +11,14 @@ const app = express();
 app.use(express.json());
 
 const port = process.env.PORT;
-const usersRoutePath = '/api/users';
+const healthRoutePath = "/health";
+const usersRoutePath = "/api/users";
 
 dbConnection();
 
+app.use(healthRoutePath, healthRoute);
 app.use(usersRoutePath, userRoutes);
 
-app.get('/', (req,res) => {
-    res.send('Hello world from users server');
-})
-
 app.listen(port, () => {
-    console.log(`🚀 Rest server listening on ${port}`)
-})
+    console.log(`🚀 Rest server listening on ${port}`);
+});

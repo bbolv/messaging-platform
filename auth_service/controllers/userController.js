@@ -1,15 +1,15 @@
-import User from "../models/User.js"
-import createJWT from "../utils/createJWT.js"
-import createId from "../utils/createId.js"
+import User from "../models/User.js";
+import createJWT from "../utils/createJWT.js";
+import createId from "../utils/createId.js";
 
 const registerUser = async (req, res) => {
     //Not duplicate emails
-    const {email} = req.body;
-    const existsUser = await User.findOne({email});
+    const { email } = req.body;
+    const existsUser = await User.findOne({ email });
 
-    if(existsUser){
+    if (existsUser) {
         const error = new Error("User already exists");
-        return res.status(400).json({ msg: error.message});
+        return res.status(400).json({ msg: error.message });
     }
 
     try {
@@ -17,44 +17,38 @@ const registerUser = async (req, res) => {
         user.token = createId();
         const userSaved = await user.save();
         res.json(userSaved);
+    } catch (error) {
+        return res.status(403).json({ msg: error.message });
     }
-    catch (error) {
-        return res.status(403).json({msg: error.message});
-    }
-}
+};
 
 const loginUser = async (req, res) => {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({email});
+    const user = await User.findOne({ email });
 
-    if(!user){
-        const error = new Error('The user does not exist');
-        return res.status(404).json({msg: error.message});
+    if (!user) {
+        const error = new Error("The user does not exist");
+        return res.status(404).json({ msg: error.message });
     }
 
-    if(await user.checkPassword(password)){
+    if (await user.checkPassword(password)) {
         res.json({
             _id: user._id,
             username: user.username,
             email: user.email,
             token: createJWT(user._id)
-        })
-    } 
-    else {
-        const error = new Error ("The password is incorrect");
-        return res.status(403).json({msg: error.message});
+        });
+    } else {
+        const error = new Error("The password is incorrect");
+        return res.status(403).json({ msg: error.message });
     }
-}
+};
 
 const profile = async (req, res) => {
-    const {user} = req;
+    const { user } = req;
 
     res.json(user);
-}
+};
 
-export {
-    registerUser,
-    loginUser,
-    profile
-}
+export { registerUser, loginUser, profile };
