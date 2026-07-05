@@ -8,6 +8,14 @@ module.exports = {
         ecmaVersion: "latest",
         sourceType: "module"
     },
+    overrides: [
+        {
+            files: ["tests/**/*.js"],
+            env: {
+                jest: true
+            }
+        }
+    ],
     rules: {
         "no-console": "off",
         "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }]
