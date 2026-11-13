@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const dbStates = {
+const dbStates: Partial<Record<number, string>> = {
     0: "disconnected",
     1: "connected",
     2: "connecting",

@@ -1,8 +1,13 @@
 import mongoose from "mongoose";
 
+export interface ChatRoom {
+    createdBy: string;
+    member: string;
+}
+
 const { Schema } = mongoose;
 
-const RoomsSchema = new Schema({
+const RoomsSchema = new Schema<ChatRoom>({
     createdBy: {
         type: String,
         required: true

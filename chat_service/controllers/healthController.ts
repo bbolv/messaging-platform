@@ -1,6 +1,7 @@
+import type { RequestHandler } from "express";
 import getDbStatus from "../db/status.js";
 
-const healthCheck = (req, res) => {
+const healthCheck: RequestHandler = (req, res) => {
     const database = getDbStatus();
 
     res.status(database.isConnected ? 200 : 503).json({
