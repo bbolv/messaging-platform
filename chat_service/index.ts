@@ -7,7 +7,8 @@ dotenv.config();
 
 const port = process.env.PORT;
 
-dbConnection();
+await dbConnection();
+console.log("✅ MongoDB connected successfully");
 
 app.listen(port, () => {
     console.log(`🚀 Rest server listening on ${port}`);

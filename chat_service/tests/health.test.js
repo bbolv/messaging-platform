@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../app.js";
+import app from "../dist/app.js";
 
 describe("GET /health", () => {
     it("returns degraded when the database is disconnected", async () => {
