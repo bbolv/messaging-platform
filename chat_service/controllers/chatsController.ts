@@ -1,18 +1,48 @@
+import type { Request, Response } from "express";
+import type { ChatMessage } from "../models/Messages.js";
+import type { ChatRoom } from "../models/Rooms.js";
+import type { ChatGroup } from "../models/Groups.js";
+
+type CreateMessageBody = Omit<
+    ChatMessage,
+    "createdAt" | "updatedAt" | "message"
+> & {
+    message: { text: string; isScribble?: boolean };
+};
+type CreateGroupBody = Pick<ChatGroup, "createdBy" | "groupName">;
+interface GroupMemberBody {
+    object: { id: string; member: string; username?: string };
+}
+
+const getErrorMessage = (error: unknown): string | undefined => {
+    if (error instanceof Error) return error.message;
+    if (typeof error === "object" && error !== null && "message" in error) {
+        return typeof error.message === "string" ? error.message : undefined;
+    }
+    return undefined;
+};
+
 import Message from "../models/Messages.js";
 import Rooms from "../models/Rooms.js";
 import Groups from "../models/Groups.js";
 
-const createMessage = async (req, res) => {
+const createMessage = async (
+    req: Request<Record<string, never>, unknown, CreateMessageBody>,
+    res: Response
+) => {
     try {
-        const message = await Message(req.body);
+        const message = new Message(req.body);
         const messageSaved = await message.save();
         res.json(messageSaved);
     } catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send(getErrorMessage(err));
     }
 };
 
-const createChatRoom = async (req, res) => {
+const createChatRoom = async (
+    req: Request<Record<string, never>, unknown, ChatRoom>,
+    res: Response
+) => {
     const originalRoom = await Rooms.find({
         createdBy: req.body.createdBy,
         member: req.body.member
@@ -36,11 +66,14 @@ const createChatRoom = async (req, res) => {
             res.json(originalRoom[0]);
         }
     } catch (err) {
-        return res.status(500).send({ error: err.message });
+        return res.status(500).send({ error: getErrorMessage(err) });
     }
 };
 
-const createGroupRoom = async (req, res) => {
+const createGroupRoom = async (
+    req: Request<Record<string, never>, unknown, CreateGroupBody>,
+    res: Response
+) => {
     const { createdBy, groupName } = req.body;
     const members = [];
     members.push(createdBy);
@@ -55,11 +88,11 @@ const createGroupRoom = async (req, res) => {
         const groupSaved = await group.save();
         res.json(groupSaved);
     } catch (err) {
-        return res.status(500).send({ error: err.message });
+        return res.status(500).send({ error: getErrorMessage(err) });
     }
 };
 
-const getAllMessages = async (req, res) => {
+const getAllMessages = async (req: Request, res: Response) => {
     const { chatId, from } = req.query;
 
     try {
@@ -89,32 +122,35 @@ const getAllMessages = async (req, res) => {
 
         res.json(shownMessages);
     } catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send(getErrorMessage(err));
     }
 };
 
-const getRoom = async (req, res) => {
+const getRoom = async (req: Request, res: Response) => {
     const id = req.query.id;
 
     try {
         const room = await Rooms.findById(id);
         res.json(room);
     } catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send(getErrorMessage(err));
     }
 };
 
-const getGroup = async (req, res) => {
+const getGroup = async (req: Request, res: Response) => {
     const id = req.query.id;
 
     try {
         const group = await Groups.findById(id);
         res.json(group);
     } catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send(getErrorMessage(err));
     }
 };
-const addMemberGroup = async (req, res) => {
+const addMemberGroup = async (
+    req: Request<Record<string, never>, unknown, GroupMemberBody>,
+    res: Response
+) => {
     const chatObject = req.body.object;
 
     if (chatObject.member === chatObject.username)
@@ -129,10 +165,13 @@ const addMemberGroup = async (req, res) => {
 
         res.json(chatUpdated);
     } catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send(getErrorMessage(err));
     }
 };
-const removeMemberGroup = async (req, res) => {
+const removeMemberGroup = async (
+    req: Request<Record<string, never>, unknown, GroupMemberBody>,
+    res: Response
+) => {
     const memberToRemove = req.body.object.member;
     const groupId = req.body.object.id;
 
@@ -151,7 +190,7 @@ const removeMemberGroup = async (req, res) => {
 
         res.json(chatUpdated);
     } catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send(getErrorMessage(err));
     }
 };
 

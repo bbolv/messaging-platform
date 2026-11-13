@@ -7,10 +7,7 @@ const dbConnection = () => {
     const URI = `mongodb://${MONGO_HOST}/${MONGO_DB}`;
 
     try {
-        mongoose.connect(URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        mongoose.connect(URI);
     } catch (error) {
         console.log(error);
         throw new Error("Error with the db");
