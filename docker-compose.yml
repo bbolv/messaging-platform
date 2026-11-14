@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   mongo:
     image: mongo
@@ -9,6 +7,17 @@ services:
       - 27017:27017
     volumes:
       - data-volume-chatapp:/data/db
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - "db.adminCommand('ping').ok ? quit(0) : quit(1)"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     networks:
       - mongo-network
 
@@ -58,10 +67,15 @@ services:
     build:
       dockerfile: Dockerfile
       context: './chat_service'
+    environment:
+      PORT: "4003"
+      MONGO_HOST: mongo:27017
+      LOG_LEVEL: info
     ports:
       - 4003:4003
-    links:
-      - mongo
+    depends_on:
+      mongo:
+        condition: service_healthy
     networks:
       - mongo-network
 
