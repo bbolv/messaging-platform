@@ -36,6 +36,7 @@
     "dependencies": {
         "dotenv": "^16.6.1",
         "express": "^4.22.3",
-        "mongoose": "^7.8.13"
+        "mongoose": "^7.8.13",
+        "winston": "^3.19.0"
     }
 }
