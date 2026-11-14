@@ -55,6 +55,50 @@ curl -i http://localhost:3003/health
 
 Returns HTTP 200 when MongoDB is connected and HTTP 503 when disconnected.
 
+## Logging
+
+The service uses a centralized Winston logger and writes logs to the console,
+where Docker can collect them.
+
+### Configuration
+
+| Variable    | Default | Description                                                                               |
+| ----------- | ------- | ----------------------------------------------------------------------------------------- |
+| `LOG_LEVEL` | `info`  | Minimum logging level. Use `debug` for more detail or `error` to show only errors.        |
+| `NODE_ENV`  | Unset   | Set to `production` to enable JSON output. Other values use a readable, colorized format. |
+
+For local development, add this to `.env`:
+
+```env
+LOG_LEVEL=info
+```
+
+### Output formats
+
+Development logs include a timestamp, level, and message.
+
+Production logs use JSON with `timestamp`, `level`, `message`, and `service`
+fields. Logged errors also include their stack trace.
+
+To run with production formatting:
+
+```bash
+npm run build
+NODE_ENV=production npm start
+```
+
+To show only errors:
+
+```bash
+LOG_LEVEL=error NODE_ENV=production npm start
+```
+
+### Startup events
+
+The service logs successful MongoDB connection and HTTP server startup at
+the `info` level. Database connection and server errors are logged at the
+`error` level.
+
 ## Docker
 
 From `chat_service`:

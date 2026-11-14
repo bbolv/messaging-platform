@@ -6,12 +6,7 @@ const dbConnection = async (): Promise<void> => {
 
     const URI = `mongodb://${MONGO_HOST}/${MONGO_DB}`;
 
-    try {
-        await mongoose.connect(URI);
-    } catch (error) {
-        console.log(error);
-        throw new Error("Error with the db");
-    }
+    await mongoose.connect(URI);
 };
 
 export default dbConnection;
